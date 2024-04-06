@@ -1,13 +1,8 @@
 ---
-# upstream virtualenv in Ubuntu 20.04 is broken
-# https://github.com/pypa/virtualenv/issues/1873
-- name: Install python virtualenv
+- name: Install python venv
   become: true
-  become_user: "{{ paperless_ngx_system_user }}"
-  ansible.builtin.pip:
-    name: virtualenv
-    extra_args: --upgrade --user
-    executable: "{{ paperless_ngx_dir_python }}/bin/pip{{ paperless_ngx_python_version_short }}"
+  ansible.builtin.package:
+    name: "{{ paperless_ngx_venv_package }}"
 
 - name: Install latest pip
   become: true
@@ -15,8 +10,7 @@
   ansible.builtin.pip:
     name: pip
     virtualenv: "{{ paperless_ngx_dir_virtualenv }}"
-    virtualenv_python: "{{ paperless_ngx_dir_python }}/bin/python{{ paperless_ngx_python_version_short }}"
-    virtualenv_command: "{{ paperless_ngx_dir_python }}/bin/python{{ paperless_ngx_python_version_short }} -m virtualenv"
+    virtualenv_command: "{{ paperless_ngx_dir_python }}/bin/python{{ paperless_ngx_python_version_short }} -m venv"
     extra_args: --upgrade
 
 - name: Install paperless-ngx python requirements
@@ -25,7 +19,7 @@
   ansible.builtin.pip:
     requirements: "{{ paperless_ngx_dir_installation }}/requirements.txt"
     virtualenv: "{{ paperless_ngx_dir_virtualenv }}"
-    virtualenv_python: "{{ paperless_ngx_dir_python }}/bin/python{{ paperless_ngx_python_version_short }}"
+    virtualenv_command: "{{ paperless_ngx_dir_python }}/bin/python{{ paperless_ngx_python_version_short }} -m venv"
     extra_args: --upgrade
   register: _install_python_requirements
   until: 'not "ReadTimeoutError" in _install_python_requirements.msg | default("")'
