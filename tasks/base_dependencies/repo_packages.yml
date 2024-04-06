@@ -18,7 +18,6 @@
       - imagemagick
       - optipng
       - gnupg
-      - libpq-dev
       - libmagic-dev
       - mariadb-client
       - mime-support
@@ -44,6 +43,12 @@
     - "not 'Temporary failure resolving' in _install_base_deps_result.stderr|default('')"
   retries: 3
   delay: 60
+
+- name: Install postgresql dependencies
+  become: true
+  ansible.builtin.apt:
+    pkg: libpq-dev
+  when: paperless_ngx_db_type == 'postgresql'
 
 - name: Install ocr languages
   become: true
